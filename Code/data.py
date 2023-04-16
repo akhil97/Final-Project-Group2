@@ -41,12 +41,10 @@ for category in categories:
             split = 'test'
         data.append([image_name, category, split])
 
-# Convert the data list to a DataFrame
-data_df = pd.DataFrame(data, columns=['image_name', 'category', 'split'])
-
 
 # Convert the data list to a DataFrame
-df = pd.DataFrame(data, columns=['image_name', 'split', 'class'])
+df = pd.DataFrame(data, columns=['image_name', 'class', 'split'])
 
-# Save the DataFrame to an Excel file
+# Save the DataFrame to an Excel file in the destination directory
+excel_file_path = os.path.join("/home/ubuntu/Project/Excel/", 'image_dataset.xlsx')
 df.to_excel('image_dataset.xlsx', index=False)
