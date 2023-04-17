@@ -1,0 +1,19 @@
+First, you'll need to make sure you have the Kaggle API installed on your system. You can install it using pip, a package installer for Python, with the following command:
+pip install kaggle
+Once you have the Kaggle API installed, you'll need to generate an API key. You can do this by logging into your Kaggle account, navigating to the "Account" tab, and clicking on "Create New API Token". This will download a JSON file with your API credentials.
+
+Next, you'll need to move the JSON file with your API credentials to the appropriate location on your system. You can do this by running the following command:
+mv ~/Downloads/kaggle.json ~/.kaggle/
+Note that you may need to modify the file path to match the location where you saved your API key.
+
+Now that you have the Kaggle API installed and your credentials set up, you can download a dataset directly from Kaggle to your terminal using the following command:
+kaggle datasets download -d <username>/<dataset-name>
+Replace <username> and <dataset-name> with the appropriate values for the dataset you want to download. You can find this information on the dataset's Kaggle page.
+
+Depending on the size of the dataset, the download may take a few minutes. Once it's finished, you should see a ZIP file with the dataset name in your current directory.
+
+You can then unzip the file using the following command:
+unzip <dataset-name>.zip
+Again, replace <dataset-name> with the appropriate value for the dataset you downloaded.
+
+That's it! You should now have the dataset downloaded and unzipped on your system.
