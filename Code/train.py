@@ -17,7 +17,10 @@ width = 100
 height = 100
 
 # check if preprocessed data exists
-already_preprocessed = os.path.exists('x_train.pkl') and os.path.exists('y_train.pkl') and os.path.exists('x_test.pkl') and os.path.exists('y_test.pkl')
+already_preprocessed = os.path.exists('x_train.pkl') and os.path.exists('y_train.pkl') and os.path.exists(
+    'x_test.pkl') and os.path.exists('y_test.pkl') and os.path.exists(
+    'x_val.pkl') and os.path.exists('y_val.pkl')
+
 
 if not already_preprocessed:
     # read and preprocess the images
@@ -46,12 +49,21 @@ if not already_preprocessed:
 
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
+    x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=42)  # 0.125 = 0.1 / 0.8
+
+
     # save preprocessed data to pickle files
     with open('x_train.pkl', 'wb') as f:
         pickle.dump(x_train, f)
 
     with open('y_train.pkl', 'wb') as f:
         pickle.dump(y_train, f)
+
+    with open('x_val.pkl', 'wb') as f:
+        pickle.dump(x_val, f)
+
+    with open('y_val.pkl', 'wb') as f:
+        pickle.dump(y_val, f)
 
     with open('x_test.pkl', 'wb') as f:
         pickle.dump(x_test, f)
@@ -62,16 +74,20 @@ else:
     # load preprocessed data from pickle files
     x_train = pickle.load(open('x_train.pkl', 'rb'))
     y_train = pickle.load(open('y_train.pkl', 'rb'))
+    x_val = pickle.load(open('x_val.pkl', 'rb'))
+    y_val = pickle.load(open('y_val.pkl', 'rb'))
     x_test = pickle.load(open('x_test.pkl', 'rb'))
     y_test = pickle.load(open('y_test.pkl', 'rb'))
 
 #load
 # normalize images
 x_train = x_train / 255
+x_val = x_val / 255
 x_test = x_test / 255
 
 # reshape images for CNN
 x_train = x_train.reshape(-1, width, height, 1)
+x_val = x_val.reshape(-1, width, height, 1)
 x_test = x_test.reshape(-1, width, height, 1)
 
 
@@ -95,7 +111,7 @@ cnn_model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 # train the CNN model
-cnn_model.fit(x_train, y_train, epochs=10)
+cnn_model.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val))
 
 # evaluate the CNN model
 print("CNN for test:", cnn_model.evaluate(x_test, y_test))  # evaluate test data
@@ -103,11 +119,13 @@ print("CNN for train:",cnn_model.evaluate(x_train, y_train))  # evaluate train d
 
 # extract features(Neural Code) from the CNN model
 train_features = cnn_model.predict(x_train)
+val_features = cnn_model.predict(x_val)
 test_features = cnn_model.predict(x_test)
 
 # train and evaluate KNN model
 neigh = KNeighborsClassifier(n_neighbors=10)
 neigh.fit(train_features, y_train)
+print("KNN for validation: ", neigh.score(val_features, y_val))
 print("KNN for test: ", neigh.score(test_features, y_test))
 print("KNN for train: ", neigh.score(train_features, y_train))
 
