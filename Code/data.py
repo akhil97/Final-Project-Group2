@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import random
 
-image_dataset_dir = '/home/ubuntu/Project/Data/'
+image_dataset_dir = '/home/ubuntu/DL/Project/Data/'
 
 # Set the target categories
 categories = ['coast', 'coast_ship', 'detail', 'land', 'multi', 'ship', 'water'] # Replace with your actual categories
@@ -54,4 +54,5 @@ df['target_class'] = one_hot_encoded.apply(lambda x: ','.join(x), axis=1)
 # Save the DataFrame to an Excel file in the destination directory
 excel_file_path = os.path.join("/home/ubuntu/Project/Excel/", 'image_dataset.xlsx')
 df.to_excel(excel_file_path, index=False)
+
 
