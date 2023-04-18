@@ -20,6 +20,25 @@ class VGG16(tf.keras.Model):
         return outputs
 
 
+class VGG19(tf.keras.Model):
+    def __init__(self, num_classes):
+        super(VGG19, self).__init__()
+        self.vgg19 = tf.keras.applications.VGG19(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
+        for layer in self.vgg19.layers:
+            layer.trainable = False
+        self.flatten = tf.keras.layers.Flatten()
+        self.dropout = tf.keras.layers.Dropout(0.5)
+        self.dense1 = tf.keras.layers.Dense(512, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(num_classes, activation='softmax')
+
+    def call(self, inputs):
+        x = self.vgg19(inputs)
+        x = self.flatten(x)
+        x = self.dropout(x)
+        x = self.dense1(x)
+        outputs = self.dense2(x)
+        return outputs
+
 class MyInceptionModel(tf.keras.Model):
     def __init__(self, num_classes):
         super(MyInceptionModel, self).__init__()
@@ -60,6 +79,26 @@ class ResNet50(tf.keras.Model):
 
     def call(self, inputs):
         x = self.resnet50(inputs)
+        x = self.flatten(x)
+        x = self.dropout(x)
+        x = self.dense1(x)
+        outputs = self.dense2(x)
+        return outputs
+
+
+class Xception(tf.keras.Model):
+    def __init__(self, num_classes):
+        super(Xception, self).__init__()
+        self.xception = tf.keras.applications.Xception(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
+        for layer in self.xception.layers:
+            layer.trainable = False
+        self.flatten = tf.keras.layers.Flatten()
+        self.dropout = tf.keras.layers.Dropout(0.5)
+        self.dense1 = tf.keras.layers.Dense(1024, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(num_classes, activation='softmax')
+
+    def call(self, inputs):
+        x = self.xception(inputs)
         x = self.flatten(x)
         x = self.dropout(x)
         x = self.dense1(x)
