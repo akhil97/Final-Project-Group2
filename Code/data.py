@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import random
 
-image_dataset_dir = '/home/ubuntu/Project/Data/'
+image_dataset_dir = '/home/ubuntu/DL/Project/Data/'
 
 # Set the target categories
 categories = ['coast', 'coast_ship', 'detail', 'land', 'multi', 'ship', 'water'] # Replace with your actual categories
@@ -39,7 +39,7 @@ for category in categories:
             split = 'val'
         else:
             split = 'test'
-        data.append([image_name, category, split])
+        data.append([image_name, category, split, category])
 
 
 # Convert the data list to a DataFrame
@@ -54,5 +54,5 @@ df.drop('one_hot', axis=1, inplace=True)
 
 
 # Save the DataFrame to an Excel file in the destination directory
-excel_file_path = os.path.join("/home/ubuntu/Project/Excel/", 'image_dataset.xlsx')
-df.to_excel('image_dataset.xlsx', index=False)
+excel_file_path = os.path.join("/home/ubuntu/DL/Project/Excel/", 'image_dataset.xlsx')
+df.to_excel(excel_file_path, index=False)
