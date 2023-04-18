@@ -39,20 +39,19 @@ for category in categories:
             split = 'val'
         else:
             split = 'test'
-        data.append([image_name, category, split])
+        data.append([image_name, category, split, category])
 
 
 # Convert the data list to a DataFrame
-df = pd.DataFrame(data, columns=['image_name', 'target', 'split', 'one_hot'])
+df = pd.DataFrame(data, columns=['image_name', 'target', 'split', 'target_class'])
 
 # Perform one-hot encoding on the 'class' column
-one_hot_encoded = pd.get_dummies(df['one_hot'])
+one_hot_encoded = pd.get_dummies(df['target_class'])
 one_hot_encoded = one_hot_encoded.astype(str) # Convert the one-hot encoded values to strings
 df['target_class'] = one_hot_encoded.apply(lambda x: ','.join(x), axis=1)
-df.drop('one_hot', axis=1, inplace=True)
-
 
 
 # Save the DataFrame to an Excel file in the destination directory
 excel_file_path = os.path.join("/home/ubuntu/Project/Excel/", 'image_dataset.xlsx')
-df.to_excel('image_dataset.xlsx', index=False)
+df.to_excel(excel_file_path, index=False)
+
