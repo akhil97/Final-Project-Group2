@@ -1,199 +1,113 @@
-import os
-import pandas as pd
-import random
 import numpy as np
+import os
+import cv2
+import pickle
+from sklearn.model_selection import train_test_split
 import tensorflow as tf
-from tensorflow.keras.utils import to_categorical
-from tensorflow.python.data import AUTOTUNE
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
+from sklearn.neighbors import KNeighborsClassifier
 
-image_dataset_dir = '/home/ubuntu/Project/Data/'
+# define the categories and image dataset path
+CATEGORIES = ['coast', 'coast_ship', "detail", "land", "multi", "ship", "water"]
+image_dataset_path = "/home/ubuntu/Project/Data/"
 
-IMAGE_SIZE = 512
-CHANNELS = 3
-n_epoch = 10
-PATH = image_dataset_dir
-BATCH_SIZE = 70
+data = []
+width = 100
+height = 100
 
-class MyModel(tf.keras.Model):
-    def __init__(self):
-        super(MyModel, self).__init__()
+# check if preprocessed data exists
+already_preprocessed = os.path.exists('x_train.pkl') and os.path.exists('y_train.pkl') and os.path.exists('x_test.pkl') and os.path.exists('y_test.pkl')
 
-        self.conv1 = tf.keras.layers.Conv2D(64, kernel_size=(5, 5), activation=tf.nn.relu)
-        self.pool1 = tf.keras.layers.MaxPool2D(2)
-        self.drop1 = tf.keras.layers.Dropout(0.2)
+if not already_preprocessed:
+    # read and preprocess the images
+    for category in CATEGORIES:
+        path = os.path.join(image_dataset_path, category) # path of dataset
+        for img in os.listdir(path):
+            try:
+                img_path = os.path.join(path, img) #Getting the image path
+                label = CATEGORIES.index(category)# Assigning label to image
+                arr = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE) # Converting image to grey scale
+                new_arr = cv2.resize(arr, (100, 100)) # Resize image
+                data.append([new_arr, label]) # appedning image and label in list
+            except Exception as e:
+                print(str(e))
 
-        self.conv2 = tf.keras.layers.Conv2D(128, kernel_size=(5, 5), activation=tf.nn.relu)
-        self.pool2 = tf.keras.layers.MaxPool2D(2)
-        self.drop2 = tf.keras.layers.Dropout(0.2)
+    # split data into train and test sets
+    x = []
+    y = []
 
-        self.flatten = tf.keras.layers.Flatten()
+    for features, label in data:
+        x.append(features)  # Storing Images all images in X
+        y.append(label)  # Storing al image label in y
 
-        self.fc = tf.keras.layers.Dense(256)
-        self.out = tf.keras.layers.Dense(7, activation='softmax')
+    x = np.array(x)  # Converting it into Numpy Array
+    y = np.array(y)
 
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
+    # save preprocessed data to pickle files
+    with open('x_train.pkl', 'wb') as f:
+        pickle.dump(x_train, f)
 
-def process_target(target_type):
-    '''
-        1- Multiclass  target = (1...n, text1...textn)
-        2- Multilabel target = ( list(Text1, Text2, Text3 ) for each observation, separated by commas )
-        3- Binary   target = (1,0)
+    with open('y_train.pkl', 'wb') as f:
+        pickle.dump(y_train, f)
 
-    :return:
-    '''
+    with open('x_test.pkl', 'wb') as f:
+        pickle.dump(x_test, f)
 
+    with open('y_test.pkl', 'wb') as f:
+        pickle.dump(y_test, f)
+else:
+    # load preprocessed data from pickle files
+    x_train = pickle.load(open('x_train.pkl', 'rb'))
+    y_train = pickle.load(open('y_train.pkl', 'rb'))
+    x_test = pickle.load(open('x_test.pkl', 'rb'))
+    y_test = pickle.load(open('y_test.pkl', 'rb'))
 
-    class_names = np.sort(xdf_data['target'].unique())
+#load
+# normalize images
+x_train = x_train / 255
+x_test = x_test / 255
 
-    if target_type == 1:
-
-        x = lambda x: tf.argmax(x == class_names).numpy()
-
-        final_target = xdf_data['target'].apply(x)
-
-        final_target = to_categorical(list(final_target))
-
-        xfinal=[]
-        for i in range(len(final_target)):
-            joined_string = ",".join(str(int(e)) for e in  (final_target[i]))
-            xfinal.append(joined_string)
-        final_target = xfinal
-
-        xdf_data['target_class'] = final_target
-
-
-    if target_type == 2:
-        target = np.array(xdf_data['target'].apply(lambda x: x.split(",")))
-
-        xdepth = len(class_names)
-
-        final_target = tf.one_hot(target, xdepth)
-
-        xfinal = []
-        if len(final_target) ==0:
-            xerror = 'Could not process Multilabel'
-        else:
-            for i in range(len(final_target)):
-                joined_string = ",".join( str(e) for e in final_target[i])
-                xfinal.append(joined_string)
-            final_target = xfinal
-
-        xdf_data['target_class'] = final_target
-
-    if target_type == 3:
-        # target_class is already done
-        pass
-
-    return class_names
-
-def process_path(feature, target):
-    '''
-          feature is the path and id of the image
-          target is the result
-          returns the image and the target as label
-    '''
-
-    label = target
-
-    file_path = feature
-    img = tf.io.read_file(file_path)
-
-    img = tf.io.decode_image(img, channels=CHANNELS, expand_animations=False)
-    img = tf.image.per_image_standardization(img)
-    img = tf.image.resize(img, [IMAGE_SIZE, IMAGE_SIZE])
-
-    # augmentation
-    img = tf.image.flip_left_right(img)
-    img = tf.image.flip_up_down(img)
-    img = tf.reshape(img, [-1])
-
-    return img, label
-
-def get_target(num_classes):
-    '''
-    Get the target from the dataset
-    1 = multiclass
-    2 = multilabel
-    3 = binary
-    '''
-
-    y_target = np.array(xdf_dset['target_class'].apply(lambda x: ([int(i) for i in str(x).split(",")])))
-
-    end = np.zeros(num_classes)
-    for s1 in y_target:
-        end = np.vstack([end, s1])
-
-    y_target = np.array(end[1:])
-
-    return y_target
-
-def train_func(train_ds):
-    '''
-        train the model
-    '''
-
-    early_stop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience = 100)
-    check_point = tf.keras.callbacks.ModelCheckpoint('model.h5', monitor='accuracy', save_best_only=True)
-    model = model_definition()
-
-    model.fit(train_ds,  epochs=n_epoch, callbacks=[early_stop, check_point])
-
-def save_model(model):
-    '''
-         receives the model and print the summary into a .txt file
-    '''
-    with open('summary.txt', 'w') as fh:
-        # Pass the file handle in as a lambda function to make it callable
-        model.summary(print_fn=lambda x: fh.write(x + '\n'))
-
-def model_definition():
-    model = MyModel()
-
-    model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-    early_stop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=100)
-    check_point = tf.keras.callbacks.ModelCheckpoint('model.h5', monitor='accuracy',
-                                                     save_best_only=True)
-    model.fit(train_ds, epochs=n_epoch, callbacks=[early_stop, check_point])
-
-    save_model(model) #print Summary
-    return model
+# reshape images for CNN
+x_train = x_train.reshape(-1, width, height, 1)
+x_test = x_test.reshape(-1, width, height, 1)
 
 
-def read_data(num_classes):
-    '''
-          reads the dataset and process the target
-    '''
+# define the CNN model
+cnn_model = Sequential()
+cnn_model.add(Conv2D(64, (3, 3), activation='relu'))
+cnn_model.add(MaxPooling2D((2, 2)))
+cnn_model.add(Conv2D(32, (3, 3), activation='relu'))
+cnn_model.add(MaxPooling2D((2, 2)))
+cnn_model.add(Flatten())
+cnn_model.add(Dense(128, activation='relu'))
+cnn_model.add(Dropout(0.5))
+cnn_model.add(Dense(128, activation='relu'))
+cnn_model.add(Dropout(0.5))
+cnn_model.add(Dense(64, activation='relu'))
+cnn_model.add(Dropout(0.5))
+cnn_model.add(Dense(7, activation='softmax'))
 
-    ds_inputs = np.array(image_dataset_dir + xdf_dset['image_name'])
-    ds_targets = get_target(num_classes)
+cnn_model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
 
-    list_ds = tf.data.Dataset.from_tensor_slices((ds_inputs,ds_targets)) # creates a tensor from the image paths and targets
+# train the CNN model
+cnn_model.fit(x_train, y_train, epochs=10)
 
-    final_ds = list_ds.map(process_path, num_parallel_calls=AUTOTUNE).batch(BATCH_SIZE)
+# evaluate the CNN model
+print("CNN for test:", cnn_model.evaluate(x_test, y_test))  # evaluate test data
+print("CNN for train:",cnn_model.evaluate(x_train, y_train))  # evaluate train data
 
-    return final_ds
+# extract features(Neural Code) from the CNN model
+train_features = cnn_model.predict(x_train)
+test_features = cnn_model.predict(x_test)
 
-
-if __name__ == "__main__":
-    for file in os.listdir(PATH+os.path.sep + "Excel"):
-        if file[-5:] == '.xlsx':
-            FILE_NAME = PATH + os.path.sep + "Excel" + os.path.sep + file
-
-    xdf_data = pd.read_excel('/home/ubuntu/DL/Project/Excel/image_dataset.xlsx')
-    print(xdf_data)
-    class_names = process_target(2)  # 1: Multiclass 2: Multilabel 3:Binary
-
-    INPUTS_r = IMAGE_SIZE * IMAGE_SIZE * CHANNELS
-    OUTPUTS_a = len(class_names)
-
-    ## Processing Train dataset
-
-    xdf_dset = xdf_data[xdf_data["split"] == 'train'].copy()
-
-    train_ds = read_data(OUTPUTS_a)
-    train_func(train_ds)
-
-
-
+# train and evaluate KNN model
+neigh = KNeighborsClassifier(n_neighbors=10)
+neigh.fit(train_features, y_train)
+print("KNN for test: ", neigh.score(test_features, y_test))
+print("KNN for train: ", neigh.score(train_features, y_train))
 
