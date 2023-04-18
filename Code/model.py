@@ -23,7 +23,7 @@ class VGG16(tf.keras.Model):
 class VGG19(tf.keras.Model):
     def __init__(self, num_classes):
         super(VGG19, self).__init__()
-        self.vgg19 = tf.keras.applications.VGG19(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
+        self.vgg19 = tf.keras.applications.VGG19(include_top=False, weights='imagenet', input_shape=(512, 512, 3))
         for layer in self.vgg19.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
@@ -39,9 +39,9 @@ class VGG19(tf.keras.Model):
         outputs = self.dense2(x)
         return outputs
 
-class MyInceptionModel(tf.keras.Model):
+class InceptionModel(tf.keras.Model):
     def __init__(self, num_classes):
-        super(MyInceptionModel, self).__init__()
+        super(InceptionModel, self).__init__()
 
         # Load the pre-trained InceptionV3 model
         self.inceptionv3 = tf.keras.applications.InceptionV3(include_top=False, weights='imagenet',
@@ -89,7 +89,7 @@ class ResNet50(tf.keras.Model):
 class Xception(tf.keras.Model):
     def __init__(self, num_classes):
         super(Xception, self).__init__()
-        self.xception = tf.keras.applications.Xception(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
+        self.xception = tf.keras.applications.Xception(include_top=False, weights='imagenet', input_shape=(512, 512, 3))
         for layer in self.xception.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
