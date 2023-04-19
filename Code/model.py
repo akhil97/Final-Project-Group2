@@ -3,7 +3,7 @@ import tensorflow as tf
 class VGG16(tf.keras.Model):
     def __init__(self, num_classes):
         super(VGG16, self).__init__()
-        self.vgg16 = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(512, 512, 3))
+        self.vgg16 = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(100, 100, 1))
         for layer in self.vgg16.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()

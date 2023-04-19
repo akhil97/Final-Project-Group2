@@ -7,7 +7,7 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
 from sklearn.neighbors import KNeighborsClassifier
-#from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
+from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
 
 # define the categories and image dataset path
 CATEGORIES = ['coast', 'coast_ship', "detail", "land", "multi", "ship", "water"]
@@ -78,16 +78,16 @@ def preprocess_data(x, y):
         x_test = pickle.load(open('x_test.pkl', 'rb'))
         y_test = pickle.load(open('y_test.pkl', 'rb'))
 
-    # load
-    # normalize images
-    x_train = x_train / 255
-    x_val = x_val / 255
-    x_test = x_test / 255
+        # load
+        # normalize images
+        x_train = x_train / 255
+        x_val = x_val / 255
+        x_test = x_test / 255
 
-    # reshape images for CNN
-    x_train = x_train.reshape(-1, width, height, 1)
-    x_val = x_val.reshape(-1, width, height, 1)
-    x_test = x_test.reshape(-1, width, height, 1)
+        # reshape images for CNN
+        x_train = x_train.reshape(-1, width, height, 1)
+        x_val = x_val.reshape(-1, width, height, 1)
+        x_test = x_test.reshape(-1, width, height, 1)
 
     return x_train, y_train, x_val, y_val, x_test, y_test
 
@@ -119,6 +119,7 @@ def train_model(model, x_train, y_train, x_val, y_val):
     #early_stop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=100)
     #check_point = tf.keras.callbacks.ModelCheckpoint('model.h5', monitor='accuracy',
     #                                                 save_best_only=True)
+    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     model.fit(x_train, y_train, epochs=10, validation_data=(x_val, y_val))
     #final_model.fit(x_train, y_train, epochs=10, callbacks=[early_stop, check_point], validation_data=(x_val, y_val))
     return model
@@ -149,7 +150,8 @@ if __name__ == "__main__":
 
     X_train, Y_train, X_val, Y_val, X_test, Y_test = preprocess_data(x, y)
 
-    model = model_definition()
+    #model = model_definition()
+    model = VGG16(num_classes=7)
 
     final_model = train_model(model, X_train, Y_train, X_val, Y_val)
     evaluate(final_model, X_train, Y_train, X_val, Y_val, X_test, Y_test)
