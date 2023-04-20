@@ -18,13 +18,13 @@ Image_Size = 100
 CHANNELS = 3  # set number of channels to 3 for RGB images
 
 
-def preprocess_data(x, y):
+def preprocess_data(x, y, force_preprocessing=True):
     # check if preprocessed data exists
     already_preprocessed = os.path.exists('x_train.pkl') and os.path.exists('y_train.pkl') and os.path.exists(
         'x_test.pkl') and os.path.exists('y_test.pkl') and os.path.exists(
         'x_val.pkl') and os.path.exists('y_val.pkl')
 
-    if not already_preprocessed:
+    if not already_preprocessed or force_preprocessing:
         # read and preprocess the images
         for category in CATEGORIES:
             path = os.path.join(image_dataset_path, category)  # path of dataset
