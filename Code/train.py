@@ -14,8 +14,8 @@ CATEGORIES = ['coast', 'coast_ship', "detail", "land", "multi", "ship", "water"]
 image_dataset_path = "/home/ubuntu/Project/Data/"
 
 data = []
-width = 100
-height = 100
+Image_Size = 100
+CHANNELS = 3  # set number of channels to 3 for RGB images
 
 
 def preprocess_data(x, y):
@@ -33,8 +33,8 @@ def preprocess_data(x, y):
                     img_path = os.path.join(path, img)  # Getting the image path
                     label = CATEGORIES.index(category)  # Assigning label to image
                     arr = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # Converting image to grey scale
-                    new_arr = cv2.resize(arr, (100, 100))  # Resize image
-                    data.append([new_arr, label])  # appedning image and label in list
+                    new_arr = cv2.resize(arr, (Image_Size, Image_Size))  # Resize image
+                    data.append([new_arr, label])  # appending image and label in list
                 except Exception as e:
                     print(str(e))
 
@@ -49,6 +49,17 @@ def preprocess_data(x, y):
 
         x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2,
                                                           random_state=42)  # 0.125 = 0.1 / 0.8
+
+        # load
+        # normalize images
+        x_train = x_train / 255
+        x_val = x_val / 255
+        x_test = x_test / 255
+
+        # reshape images for CNN
+        x_train = x_train.reshape(-1, Image_Size, Image_Size, CHANNELS)
+        x_val = x_val.reshape(-1, Image_Size, Image_Size, CHANNELS)
+        x_test = x_test.reshape(-1, Image_Size, Image_Size, CHANNELS)
 
         # save preprocessed data to pickle files
         with open('x_train.pkl', 'wb') as f:
@@ -78,16 +89,6 @@ def preprocess_data(x, y):
         x_test = pickle.load(open('x_test.pkl', 'rb'))
         y_test = pickle.load(open('y_test.pkl', 'rb'))
 
-        # load
-        # normalize images
-        x_train = x_train / 255
-        x_val = x_val / 255
-        x_test = x_test / 255
-
-        # reshape images for CNN
-        x_train = x_train.reshape(-1, width, height, 1)
-        x_val = x_val.reshape(-1, width, height, 1)
-        x_test = x_test.reshape(-1, width, height, 1)
 
     return x_train, y_train, x_val, y_val, x_test, y_test
 
