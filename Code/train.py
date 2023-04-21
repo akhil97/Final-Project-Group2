@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
     #model = model_definition()
     model = VGG16(num_classes=7)
-
+    print(model.name)
     final_model = train_model(model, X_train, Y_train, X_val, Y_val)
     evaluate(final_model, X_train, Y_train, X_val, Y_val, X_test, Y_test)
 
