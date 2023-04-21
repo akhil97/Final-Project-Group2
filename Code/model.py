@@ -4,7 +4,7 @@ Image_Size = 100
 CHANNELS = 3  # set number of channels to 3 for RGB images
 
 class VGG16(tf.keras.Model):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, learning_rate):
         super(VGG16, self).__init__()
         self.vgg16 = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
         for layer in self.vgg16.layers:
@@ -24,7 +24,7 @@ class VGG16(tf.keras.Model):
 
 
 class VGG19(tf.keras.Model):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, learning_rate):
         super(VGG19, self).__init__()
         self.vgg19 = tf.keras.applications.VGG19(include_top=False, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
         for layer in self.vgg19.layers:
@@ -43,7 +43,7 @@ class VGG19(tf.keras.Model):
         return outputs
 
 class InceptionModel(tf.keras.Model):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, learning_rate):
         super(InceptionModel, self).__init__()
 
         # Load the pre-trained InceptionV3 model
@@ -70,7 +70,7 @@ class InceptionModel(tf.keras.Model):
 
 
 class ResNet50(tf.keras.Model):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, learning_rate):
         super(ResNet50, self).__init__()
         self.resnet50 = tf.keras.applications.ResNet50(include_top=False, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
         for layer in self.resnet50.layers:
@@ -90,7 +90,7 @@ class ResNet50(tf.keras.Model):
 
 
 class Xception(tf.keras.Model):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, learning_rate):
         super(Xception, self).__init__()
         self.xception = tf.keras.applications.Xception(include_top=False, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
         for layer in self.xception.layers:
