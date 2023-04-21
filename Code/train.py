@@ -7,6 +7,7 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import f1_score, accuracy_score
 from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
@@ -17,7 +18,7 @@ image_dataset_path = "/home/ubuntu/DL/Project/Data/"
 data = []
 Image_Size = 100
 CHANNELS = 3  # set number of channels to 3 for RGB images
-n_epochs = 50
+n_epochs = 2
 batch_size = 32
 learning_rate = 0.001
 num_classes = 7
@@ -42,7 +43,7 @@ def preprocess_data(x, y, force_preprocessing=True):
                 try:
                     img_path = os.path.join(path, img)  # Getting the image path
                     label = CATEGORIES.index(category)  # Assigning label to image
-                    arr = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # Converting image to grey scale
+                    arr = cv2.imread(img_path)  # RGB image
                     new_arr = cv2.resize(arr, (Image_Size, Image_Size))  # Resize image
                     new_arr = datagen.random_transform(new_arr)  # apply image augmentation
                     data.append([new_arr, label])  # appending image and label in list
@@ -136,6 +137,7 @@ def train_model(model, x_train, y_train, x_val, y_val):
     #                                                 save_best_only=True)
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     model.fit(x_train, y_train, epochs=n_epochs, validation_data=(x_val, y_val))
+    print(model.summary())
     #final_model.fit(x_train, y_train, epochs=10, callbacks=[early_stop, check_point], validation_data=(x_val, y_val))
     return model
 
@@ -155,6 +157,7 @@ def evaluate(final_model, x_train, y_train, x_val, y_val, x_test, y_test):
     print("KNN for validation: ", neigh.score(val_features, y_val))
     print("KNN for test: ", neigh.score(test_features, y_test))
     print("KNN for train: ", neigh.score(train_features, y_train))
+    #print("F1 score:", f1_score(y_test, test_features))
 
 
 
@@ -166,7 +169,7 @@ if __name__ == "__main__":
     X_train, Y_train, X_val, Y_val, X_test, Y_test = preprocess_data(x, y)
 
     #model = model_definition()
-    model = VGG16(num_classes, learning_rate)
+    model = Xception(num_classes, learning_rate)
     print(model.name)
     final_model = train_model(model, X_train, Y_train, X_val, Y_val)
     evaluate(final_model, X_train, Y_train, X_val, Y_val, X_test, Y_test)
