@@ -42,7 +42,7 @@ def preprocess_data(x, y, force_preprocessing=True):
                 try:
                     img_path = os.path.join(path, img)  # Getting the image path
                     label = CATEGORIES.index(category)  # Assigning label to image
-                    arr = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # Converting image to grey scale
+                    arr = cv2.imread(img_path)  # RGB image
                     new_arr = cv2.resize(arr, (Image_Size, Image_Size))  # Resize image
                     new_arr = datagen.random_transform(new_arr)  # apply image augmentation
                     data.append([new_arr, label])  # appending image and label in list
