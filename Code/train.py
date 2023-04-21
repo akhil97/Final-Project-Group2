@@ -11,7 +11,7 @@ from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
 
 # define the categories and image dataset path
 CATEGORIES = ['coast', 'coast_ship', "detail", "land", "multi", "ship", "water"]
-image_dataset_path = "/home/ubuntu/Project/Data/"
+image_dataset_path = "/home/ubuntu/DL/Project/Data/"
 
 data = []
 Image_Size = 100
