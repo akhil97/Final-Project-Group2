@@ -1,5 +1,7 @@
 import numpy as np
 import os
+#hide warning
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # or '3' to hide all warning messages
 import cv2
 import pickle
 from sklearn.model_selection import train_test_split
@@ -10,6 +12,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import f1_score, accuracy_score
 from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from sklearn.metrics import classification_report
 
 # define the categories and image dataset path
 CATEGORIES = ['coast', 'coast_ship', "detail", "land", "multi", "ship", "water"]
@@ -154,11 +157,14 @@ def evaluate(final_model, x_train, y_train, x_val, y_val, x_test, y_test):
     # train and evaluate KNN model
     neigh = KNeighborsClassifier(n_neighbors=10)
     neigh.fit(train_features, y_train)
-    print("KNN for validation: ", neigh.score(val_features, y_val))
-    print("KNN for test: ", neigh.score(test_features, y_test))
-    print("KNN for train: ", neigh.score(train_features, y_train))
-    #print("F1 score:", f1_score(y_test, test_features))
 
+    # evaluate the KNN model using classification report
+    print("KNN classification report for validation data:")
+    print(classification_report(y_val, neigh.predict(val_features)))
+    print("KNN classification report for train data:")
+    print(classification_report(y_train, neigh.predict(train_features)))
+    print("KNN classification report for test data:")
+    print(classification_report(y_test, neigh.predict(test_features)))
 
 
 if __name__ == "__main__":
