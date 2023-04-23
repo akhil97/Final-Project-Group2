@@ -10,7 +10,7 @@ class VGG16(tf.keras.Model):
         for layer in self.vgg16.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
-        self.dense1 = tf.keras.layers.Dense(2048, activation='relu')
+        self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
         self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
         self.dropout = tf.keras.layers.Dropout(0.2)
@@ -34,7 +34,7 @@ class VGG19(tf.keras.Model):
         for layer in self.vgg19.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
-        self.dense1 = tf.keras.layers.Dense(2048, activation='relu')
+        self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
         self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
         self.dropout = tf.keras.layers.Dropout(0.2)
@@ -64,7 +64,7 @@ class InceptionModel(tf.keras.Model):
 
         # Add custom layers on top of the pre-trained model
         self.avgpool = tf.keras.layers.GlobalAveragePooling2D()
-        self.dense1 = tf.keras.layers.Dense(2048, activation='relu')
+        self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
         self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
         self.dropout = tf.keras.layers.Dropout(0.2)
@@ -88,7 +88,7 @@ class ResNet50(tf.keras.Model):
         for layer in self.resnet50.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
-        self.dense1 = tf.keras.layers.Dense(2048, activation='relu')
+        self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
         self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
         self.dropout = tf.keras.layers.Dropout(0.2)
@@ -112,7 +112,7 @@ class Xception(tf.keras.Model):
         for layer in self.xception.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
-        self.dense1 = tf.keras.layers.Dense(2048, activation='relu')
+        self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
         self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
         self.dropout = tf.keras.layers.Dropout(0.2)
