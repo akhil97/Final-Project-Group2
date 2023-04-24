@@ -12,7 +12,8 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropou
 from sklearn.neighbors import KNeighborsClassifier
 from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from sklearn.metrics import classification_report
+from sklearn.metrics import f1_score, recall_score, precision_score
+from sklearn.utils.class_weight import compute_class_weight
 
 # define the categories and image dataset path
 CATEGORIES = ['coast', 'coast_ship', "detail", "land", "multi", "ship", "water"]
@@ -137,44 +138,55 @@ def model_definition(num_classes, learning_rate):
 
 def train_model(model, x_train, y_train, x_val, y_val):
 
+    class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
+    class_weight_dict = dict(zip(np.unique(y_train), class_weights))
+
     # train the CNN model
     #early_stop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=100)
     #check_point = tf.keras.callbacks.ModelCheckpoint('model.h5', monitor='accuracy', save_best_only=True)
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train, epochs=n_epochs, validation_data=(x_val, y_val))
-    print(model.summary())
+    model.fit(x_train, y_train, epochs=n_epochs, batch_size=batch_size, validation_data=(x_val, y_val), class_weight=class_weight_dict)
     #model.fit(x_train, y_train, epochs=10, callbacks=[early_stop, check_point], validation_data=(x_val, y_val))
+
+    print(model.summary())
     return model
 
 def evaluate(final_model, x_train, y_train, x_val, y_val, x_test, y_test):
-    if final_model.name == 'sequential':
-        # evaluate the CNN model
-        print("Train:", final_model.evaluate(x_train, y_train))  # evaluate train data
-        print("Valid:", final_model.evaluate(x_val, y_val))  # evaluate train data
-        print("Test:", final_model.evaluate(x_test, y_test))  # evaluate test data
+    # evaluate the CNN model
+    train_loss, train_acc = final_model.evaluate(x_train, y_train)  # evaluate train data
+    print("Train - Loss:", train_loss, "Accuracy:", train_acc)
+    val_loss, val_acc = final_model.evaluate(x_val, y_val)  # evaluate validation data
+    print("Validation - Loss:", val_loss, "Accuracy:", val_acc)
+    test_loss, test_acc = final_model.evaluate(x_test, y_test)  # evaluate test data
+    print("Test - Loss:", test_loss, "Accuracy:", test_acc)
 
-        # extract features(Neural Code) from the CNN model
-        train_features = final_model.predict(x_train)
-        val_features = final_model.predict(x_val)
-        test_features = final_model.predict(x_test)
+    # extract features(Neural Code) from the CNN model
+    train_features = final_model.predict(x_train)
+    val_features = final_model.predict(x_val)
+    test_features = final_model.predict(x_test)
 
-        # train and evaluate KNN model
-        neigh = KNeighborsClassifier(n_neighbors=10)
-        neigh.fit(train_features, y_train)
+    # train and evaluate KNN model
+    neigh = KNeighborsClassifier(n_neighbors=10)
+    neigh.fit(train_features, y_train)
 
-        # evaluate the KNN model using classification report
-        print("KNN classification report for train data:")
-        print(classification_report(y_train, neigh.predict(train_features)))
-        print("KNN classification report for validation data:")
-        print(classification_report(y_val, neigh.predict(val_features)))
-        print("KNN classification report for test data:")
-        print(classification_report(y_test, neigh.predict(test_features)))
+    # evaluate the KNN model using f1 score, recall, and precision
+    train_pred = neigh.predict(train_features)
+    train_f1 = f1_score(y_train, train_pred, average='weighted', zero_division=1)
+    train_recall = recall_score(y_train, train_pred, average='weighted', zero_division=1)
+    train_precision = precision_score(y_train, train_pred, average='weighted', zero_division=1)
+    print("Evaluation report on train data for {} - F1 score:".format(final_model.name), train_f1, "Recall:", train_recall, "Precision:", train_precision)
 
-    else:
-        predictions = np.argmax(final_model.predict(x_test), axis = 1)
-        print("Classification report on test data for {}:".format(final_model.name))
-        print(classification_report(y_test, predictions, zero_division=1))
+    val_pred = neigh.predict(val_features)
+    val_f1 = f1_score(y_val, val_pred, average='weighted', zero_division=1)
+    val_recall = recall_score(y_val, val_pred, average='weighted', zero_division=1)
+    val_precision = precision_score(y_val, val_pred, average='weighted', zero_division=1)
+    print("Evaluation report on validation data for {} - F1 score:".format(final_model.name), val_f1, "Recall:", val_recall, "Precision:", val_precision)
 
+    test_pred = neigh.predict(test_features)
+    test_f1 = f1_score(y_test, test_pred, average='weighted', zero_division=1)
+    test_recall = recall_score(y_test, test_pred, average='weighted', zero_division=1)
+    test_precision = precision_score(y_test, test_pred, average='weighted', zero_division=1)
+    print("Evaluation report on test data for {} - F1 score:".format(final_model.name), test_f1, "Recall:", test_recall, "Precision:", test_precision)
 
 
 if __name__ == "__main__":
@@ -188,26 +200,26 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.model == 'VGG16':
         vgg16 = VGG16(num_classes, learning_rate)
-        train_model(vgg16, X_train, Y_train, X_val, Y_val)
+        train_model(vgg16, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(vgg16, X_train, Y_train, X_val, Y_val, X_test, Y_test)
     if args.model == 'VGG19':
         vgg19 = VGG19(num_classes, learning_rate)
-        train_model(vgg19, X_train, Y_train, X_val, Y_val)
+        train_model(vgg19, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(vgg19, X_train, Y_train, X_val, Y_val, X_test, Y_test)
     if args.model == 'Inception':
         inception = InceptionModel(num_classes, learning_rate)
-        train_model(inception, X_train, Y_train, X_val, Y_val)
+        train_model(inception, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(inception, X_train, Y_train, X_val, Y_val, X_test, Y_test)
     if args.model == 'Resnet':
         resnet = ResNet50(num_classes, learning_rate)
-        train_model(resnet, X_train, Y_train, X_val, Y_val)
+        train_model(resnet, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(resnet, X_train, Y_train, X_val, Y_val, X_test, Y_test)
     if args.model == 'Xception':
         xception = Xception(num_classes, learning_rate)
-        train_model(xception, X_train, Y_train, X_val, Y_val)
+        train_model(xception, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(xception, X_train, Y_train, X_val, Y_val, X_test, Y_test)
     if args.model == 'CNN-KNN':
         model = model_definition(num_classes, learning_rate)
-        train_model(model, X_train, Y_train, X_val, Y_val)
+        train_model(model, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(model, X_train, Y_train, X_val, Y_val, X_test, Y_test)
 
