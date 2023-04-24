@@ -25,7 +25,7 @@ image_dataset_path = project_dir + os.path.sep + 'Data'
 data = []
 Image_Size = 100
 CHANNELS = 3  # set number of channels to 3 for RGB images
-n_epochs = 2
+n_epochs = 100
 batch_size = 32
 learning_rate = 0.001
 num_classes = 7
@@ -136,7 +136,7 @@ def model_definition(num_classes, learning_rate):
 
     return cnn_model
 
-def train_model(model, x_train, y_train, x_val, y_val):
+def train_model(model, x_train, y_train, x_val, y_val, n_epochs, batch_size):
 
     class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
     class_weight_dict = dict(zip(np.unique(y_train), class_weights))
