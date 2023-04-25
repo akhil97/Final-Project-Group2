@@ -7,8 +7,7 @@ Once you have downloaded the dataset, clone this github repository and make sure
 3. Final-Group-Presentation - Powerpoint presentation
 4. Final-Group-Project-Report - PDF Report
 5. Group Proposal - PDF
-6. Pretrained results - Word document containing the results
-7. Individual-Final-Project-Report
+6. Individual-Final-Project-Report
 
 Once you have downloaded the dataset ensure that you place it in a Data folder and the path for it is the same as that of all the folders mentioned above. 
 This means that you should have 8 folders in total (including Data).
