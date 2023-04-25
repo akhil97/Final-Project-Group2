@@ -194,7 +194,7 @@ def evaluate(model, x_train, y_train, x_val, y_val, x_test, y_test):
     test_recall = recall_score(y_test, test_pred, average='weighted')
     test_precision = precision_score(y_test, test_pred, average='weighted')
     test_acc = accuracy_score(y_test, test_pred)
-    print("Evaluation report on test data for {} - F1 score:".format(fmodel.name), test_f1, "Recall:", test_recall, "Precision:", test_precision, "Accuracy:", test_acc)
+    print("Evaluation report on test data for {} - F1 score:".format(model.name), test_f1, "Recall:", test_recall, "Precision:", test_precision, "Accuracy:", test_acc)
 
 if __name__ == "__main__":
 
