@@ -24,6 +24,7 @@ The Data folder should consist of these seven folders namely:-
 Once your project structure is ready, use the below command for running the script:-
 <br>
 > cd Code/
+> 
 > python3 train.py --model {model-name}
 <br>
 Replace model-name with "VGG16", "VGG19", "Inception", "Resnet", "Xception", "CNN-KNN" to use the train script. The environment in which the code is running
