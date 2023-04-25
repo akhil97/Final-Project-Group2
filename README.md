@@ -25,7 +25,7 @@ Once your project structure is ready, use the below command for running the scri
 <br>
 > cd Code/
 <br>
-> python3 train.py --model <model-name>
+> python3 train.py --model {model-name}
 <br>
 Replace model-name with "VGG16", "VGG19", "Inception", "Resnet", "Xception", "CNN-KNN" to use the train script. The environment in which the code is running
 <br>
