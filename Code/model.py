@@ -1,6 +1,6 @@
 import tensorflow as tf
 from keras import regularizers
-from tensorflow.keras.layers import BatchNormalization
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation, BatchNormalization
 
 Image_Size = 100
 CHANNELS = 3  # set number of channels to 3 for RGB images
