@@ -8,7 +8,7 @@ import argparse
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, Activation, BatchNormalization
 from sklearn.neighbors import KNeighborsClassifier
 from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
