@@ -24,12 +24,10 @@ The Data folder should consist of these seven folders namely:-
 Once your project structure is ready, use the below command for running the script:-
 <br>
 > cd Code/
-<br>
 > python3 train.py --model {model-name}
 <br>
 Replace model-name with "VGG16", "VGG19", "Inception", "Resnet", "Xception", "CNN-KNN" to use the train script. The environment in which the code is running
-<br>
-should have the following packages:-
+should have the following packages installed:-
 1. tensorflow == 2.11.0
 2. keras == 2.11.0
 3. sklearn == 1.2.0
