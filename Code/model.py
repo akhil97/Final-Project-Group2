@@ -1,4 +1,5 @@
 import tensorflow as tf
+from keras import regularizers
 
 Image_Size = 100
 CHANNELS = 3  # set number of channels to 3 for RGB images
@@ -12,9 +13,9 @@ class VGG16(tf.keras.Model):
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax')
+        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
         x = self.vgg16(inputs)
@@ -36,9 +37,9 @@ class VGG19(tf.keras.Model):
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax')
+        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
         x = self.vgg19(inputs)
@@ -66,9 +67,9 @@ class InceptionModel(tf.keras.Model):
         self.avgpool = tf.keras.layers.GlobalAveragePooling2D()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax')
+        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
         x = self.inceptionv3(inputs)
@@ -90,9 +91,9 @@ class ResNet50(tf.keras.Model):
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax')
+        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
         x = self.resnet50(inputs)
@@ -114,9 +115,9 @@ class Xception(tf.keras.Model):
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense2 = tf.keras.layers.Dense(1256, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.dropout = tf.keras.layers.Dropout(0.2)
-        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax')
+        self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
         x = self.xception(inputs)
