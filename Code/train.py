@@ -113,7 +113,7 @@ def preprocess_data(x, y, force_preprocessing=True):
     return x_train, y_train, x_val, y_val, x_test, y_test
 
 def model_definition(num_classes, learning_rate):
-    # define the CNN model
+    # define the CNNmodel
     cnn_model = Sequential()
     cnn_model.add(Conv2D(64, (3, 3), activation='relu'))
     cnn_model.add(BatchNormalization())
@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
     X_train, Y_train, X_val, Y_val, X_test, Y_test = preprocess_data(x, y)
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model', help='VGG16, VGG19, Inception, Resnet, Xception, CNN-KNN')
+    parser.add_argument('--model', help='VGG16, VGG19, Inception, Resnet, Xception, CNNmodel')
     args = parser.parse_args()
     if args.model == 'VGG16':
         vgg16 = VGG16(num_classes, learning_rate)
@@ -226,7 +226,7 @@ if __name__ == "__main__":
         xception = Xception(num_classes, learning_rate)
         train_model(xception, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(xception, X_train, Y_train, X_val, Y_val, X_test, Y_test)
-    if args.model == 'CNN-KNN':
+    if args.model == 'CNNmodel':
         model = model_definition(num_classes, learning_rate)
         train_model(model, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(model, X_train, Y_train, X_val, Y_val, X_test, Y_test)
