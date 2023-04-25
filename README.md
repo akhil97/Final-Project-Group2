@@ -1,5 +1,5 @@
 # Final-Project-Group2
-The link to download the dataset is here:- https://www.kaggle.com/datasets/gasgallo/masati-shipdetection. Refer the kaggle dataset download guidelines for more details.
+The link to download the dataset is here:- https://www.kaggle.com/datasets/gasgallo/masati-shipdetection. Refer the kaggle dataset download guide for more details.
 Download the dataset first from the above link.
 Once you have downloaded the dataset, clone this github repository and make sure you have the folders:-
 1. Code - Python scripts
@@ -24,15 +24,14 @@ The Data folder should consist of these seven folders namely:-
 Once your project structure is ready, use the below command for running the script:-
 <br>
 > cd Code/
-<br>
-> python3 train.py --model <model-name>
+> 
+> python3 train.py --model {model-name}
 <br>
 Replace model-name with "VGG16", "VGG19", "Inception", "Resnet", "Xception", "CNN-KNN" to use the train script. The environment in which the code is running
-<br>
-should have the following packages:-
-1. tensorflow == 2.11.0
-2. keras == 2.11.0
-3. sklearn == 1.2.0
-4. cv2 == 4.7.0
-5. numpy == 1.24.1
+should have the following packages installed:- <br>
+1. tensorflow == 2.11.0 <br>
+2. keras == 2.11.0 <br>
+3. sklearn == 1.2.0 <br>
+4. cv2 == 4.7.0 <br>
+5. numpy == 1.24.1 <br>
 
