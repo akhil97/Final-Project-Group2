@@ -26,7 +26,7 @@ Once your project structure is ready, use the below command for running the scri
 > 
 > python3 train.py --model {model-name}
 <br>
-Replace model-name with "VGG16", "VGG19", "Inception", "Resnet", "Xception", "CNN-KNN" to use the train script. The environment in which the code is running
+Replace model-name with "VGG16", "VGG19", "Inception", "Resnet", "Xception", "'CNNmodel'" to use the train script. The environment in which the code is running
 should have the following packages installed:- <br>
 1. tensorflow == 2.11.0 <br>
 2. keras == 2.11.0 <br>
