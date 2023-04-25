@@ -14,21 +14,25 @@ from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import f1_score, recall_score, precision_score
 from sklearn.utils.class_weight import compute_class_weight
+from sklearn.model_selection import RandomizedSearchCV
 
-# define the categories and image dataset path
-CATEGORIES = ['coast', 'coast_ship', "detail", "land", "multi", "ship", "water"]
+# image dataset path
 code_dir = os.getcwd()
 os.chdir("..") # Change to the parent directory
 project_dir = os.getcwd()
 image_dataset_path = project_dir + os.path.sep + 'Data'
 
+#define the categories
+CATEGORIES = ['coast', 'coast_ship', "detail", "land", "multi", "ship", "water"]
+num_classes = 7
+CHANNELS = 3  # set number of channels to 3 for RGB images
+
 data = []
 Image_Size = 100
-CHANNELS = 3  # set number of channels to 3 for RGB images
-n_epochs = 100
+n_epochs = 50
 batch_size = 32
 learning_rate = 0.001
-num_classes = 7
+
 
 def preprocess_data(x, y, force_preprocessing=True):
     # check if preprocessed data exists
@@ -38,7 +42,7 @@ def preprocess_data(x, y, force_preprocessing=True):
 
     if not already_preprocessed or force_preprocessing:
         # apply image augmentation
-        datagen = ImageDataGenerator(rotation_range=30,
+        datagen = ImageDataGenerator(rotation_range=45,
                                      zoom_range=0.2,
                                      horizontal_flip=True,
                                      vertical_flip=True)
@@ -65,9 +69,7 @@ def preprocess_data(x, y, force_preprocessing=True):
         y = np.array(y)
 
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
-
-        x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2,
-                                                          random_state=42)  # 0.125 = 0.1 / 0.8
+        x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=42)  # 0.125 = 0.1 / 0.8
 
         # load
         # normalize images
@@ -108,31 +110,23 @@ def preprocess_data(x, y, force_preprocessing=True):
         x_test = pickle.load(open('x_test.pkl', 'rb'))
         y_test = pickle.load(open('y_test.pkl', 'rb'))
 
-
     return x_train, y_train, x_val, y_val, x_test, y_test
 
 def model_definition(num_classes, learning_rate):
     # define the CNN model
     cnn_model = Sequential()
     cnn_model.add(Conv2D(64, (3, 3), activation='relu'))
+    cnn_model.add(BatchNormalization())
     cnn_model.add(MaxPooling2D((2, 2)))
     cnn_model.add(Conv2D(32, (3, 3), activation='relu'))
+    cnn_model.add(BatchNormalization())
     cnn_model.add(MaxPooling2D((2, 2)))
     cnn_model.add(Flatten())
     cnn_model.add(Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)))
     cnn_model.add(Dropout(0.5))
-    cnn_model.add(Dense(128, activation='relu'))
-    cnn_model.add(Dropout(0.5))
     cnn_model.add(Dense(64, activation='relu'))
     cnn_model.add(Dropout(0.5))
     cnn_model.add(Dense(7, activation='softmax'))
-
-    # define optimizer with learning rate
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-
-    cnn_model.compile(optimizer=optimizer,
-                      loss='sparse_categorical_crossentropy',
-                      metrics=['accuracy'])
 
     return cnn_model
 
@@ -141,12 +135,12 @@ def train_model(model, x_train, y_train, x_val, y_val, n_epochs, batch_size):
     class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
     class_weight_dict = dict(zip(np.unique(y_train), class_weights))
 
+    # Define early stopping
+    early_stop = tf.keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=10, verbose=1, mode='max')
+
     # train the CNN model
-    #early_stop = tf.keras.callbacks.EarlyStopping(monitor='accuracy', patience=100)
-    #check_point = tf.keras.callbacks.ModelCheckpoint('model.h5', monitor='accuracy', save_best_only=True)
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     model.fit(x_train, y_train, epochs=n_epochs, batch_size=batch_size, validation_data=(x_val, y_val), class_weight=class_weight_dict)
-    #model.fit(x_train, y_train, epochs=10, callbacks=[early_stop, check_point], validation_data=(x_val, y_val))
 
     print(model.summary())
     return model
@@ -165,31 +159,42 @@ def evaluate(final_model, x_train, y_train, x_val, y_val, x_test, y_test):
     val_features = final_model.predict(x_val)
     test_features = final_model.predict(x_test)
 
-    # train and evaluate KNN model
-    neigh = KNeighborsClassifier(n_neighbors=10)
+    # define parameter grid for KNN hyperparameters
+    param_grid = {
+        'n_neighbors': [5, 10, 15],
+        'weights': ['uniform', 'distance'],
+        'p': [1, 2]
+    }
+
+    # define randomized search to find best hyperparameters for KNN
+    knn_search = RandomizedSearchCV(KNeighborsClassifier(), param_grid, cv=5, n_iter=10, n_jobs=-1)
+    knn_search.fit(train_features, y_train)
+
+    # train and evaluate KNN model with best hyperparameters
+    neigh = knn_search.best_estimator_
     neigh.fit(train_features, y_train)
 
     # evaluate the KNN model using f1 score, recall, and precision
     train_pred = neigh.predict(train_features)
-    train_f1 = f1_score(y_train, train_pred, average='weighted', zero_division=1)
-    train_recall = recall_score(y_train, train_pred, average='weighted', zero_division=1)
+    train_f1 = f1_score(y_train, train_pred, average='weighted')
+    train_recall = recall_score(y_train, train_pred, average='weighted')
     train_precision = precision_score(y_train, train_pred, average='weighted', zero_division=1)
     print("Evaluation report on train data for {} - F1 score:".format(final_model.name), train_f1, "Recall:", train_recall, "Precision:", train_precision)
 
     val_pred = neigh.predict(val_features)
-    val_f1 = f1_score(y_val, val_pred, average='weighted', zero_division=1)
-    val_recall = recall_score(y_val, val_pred, average='weighted', zero_division=1)
+    val_f1 = f1_score(y_val, val_pred, average='weighted')
+    val_recall = recall_score(y_val, val_pred, average='weighted')
     val_precision = precision_score(y_val, val_pred, average='weighted', zero_division=1)
     print("Evaluation report on validation data for {} - F1 score:".format(final_model.name), val_f1, "Recall:", val_recall, "Precision:", val_precision)
 
     test_pred = neigh.predict(test_features)
-    test_f1 = f1_score(y_test, test_pred, average='weighted', zero_division=1)
-    test_recall = recall_score(y_test, test_pred, average='weighted', zero_division=1)
-    test_precision = precision_score(y_test, test_pred, average='weighted', zero_division=1)
+    test_f1 = f1_score(y_test, test_pred, average='weighted')
+    test_recall = recall_score(y_test, test_pred, average='weighted')
+    test_precision = precision_score(y_test, test_pred, average='weighted')
     print("Evaluation report on test data for {} - F1 score:".format(final_model.name), test_f1, "Recall:", test_recall, "Precision:", test_precision)
 
-
 if __name__ == "__main__":
+
     # split data into train and test sets
     x = []
     y = []
@@ -222,4 +227,3 @@ if __name__ == "__main__":
         model = model_definition(num_classes, learning_rate)
         train_model(model, X_train, Y_train, X_val, Y_val, n_epochs, batch_size)
         evaluate(model, X_train, Y_train, X_val, Y_val, X_test, Y_test)
-
