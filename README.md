@@ -1,5 +1,5 @@
 # Final-Project-Group2
-The link to download the dataset is here:- https://www.kaggle.com/datasets/gasgallo/masati-shipdetection. Refer the kaggle dataset download guidelines for more details.
+The link to download the dataset is here:- https://www.kaggle.com/datasets/gasgallo/masati-shipdetection. Refer the kaggle dataset download guide for more details.
 Download the dataset first from the above link.
 Once you have downloaded the dataset, clone this github repository and make sure you have the folders:-
 1. Code - Python scripts
