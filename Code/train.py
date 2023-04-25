@@ -12,7 +12,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropou
 from sklearn.neighbors import KNeighborsClassifier
 from model import VGG16, VGG19, InceptionModel, ResNet50, Xception
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from sklearn.metrics import f1_score, recall_score, precision_score
+from sklearn.metrics import f1_score, recall_score, precision_score, accuracy_score
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.model_selection import RandomizedSearchCV
 
@@ -179,19 +179,22 @@ def evaluate(final_model, x_train, y_train, x_val, y_val, x_test, y_test):
     train_f1 = f1_score(y_train, train_pred, average='weighted')
     train_recall = recall_score(y_train, train_pred, average='weighted')
     train_precision = precision_score(y_train, train_pred, average='weighted', zero_division=1)
-    print("Evaluation report on train data for {} - F1 score:".format(final_model.name), train_f1, "Recall:", train_recall, "Precision:", train_precision)
+    train_acc = accuracy_score(y_train, train_pred)
+    print("Evaluation report on train data for {} - F1 score:".format(final_model.name), train_f1, "Recall:", train_recall, "Precision:", train_precision, "Accuracy:", train_acc)
 
     val_pred = neigh.predict(val_features)
     val_f1 = f1_score(y_val, val_pred, average='weighted')
     val_recall = recall_score(y_val, val_pred, average='weighted')
     val_precision = precision_score(y_val, val_pred, average='weighted', zero_division=1)
-    print("Evaluation report on validation data for {} - F1 score:".format(final_model.name), val_f1, "Recall:", val_recall, "Precision:", val_precision)
+    val_accuracy = accuracy_score(y_val, val_pred)
+    print("Evaluation report on validation data for {} - F1 score:".format(final_model.name), val_f1, "Recall:", val_recall, "Precision:", val_precision, "Accuracy:", val_accuracy)
 
     test_pred = neigh.predict(test_features)
     test_f1 = f1_score(y_test, test_pred, average='weighted')
     test_recall = recall_score(y_test, test_pred, average='weighted')
     test_precision = precision_score(y_test, test_pred, average='weighted')
-    print("Evaluation report on test data for {} - F1 score:".format(final_model.name), test_f1, "Recall:", test_recall, "Precision:", test_precision)
+    test_acc = accuracy_score(y_test, test_pred)
+    print("Evaluation report on test data for {} - F1 score:".format(final_model.name), test_f1, "Recall:", test_recall, "Precision:", test_precision, "Accuracy:", test_acc)
 
 if __name__ == "__main__":
 
