@@ -140,24 +140,24 @@ def train_model(model, x_train, y_train, x_val, y_val, n_epochs, batch_size):
 
     # train the CNN model
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-    model.fit(x_train, y_train, epochs=n_epochs, batch_size=batch_size, validation_data=(x_val, y_val), class_weight=class_weight_dict)
+    model.fit(x_train, y_train, epochs=n_epochs, batch_size=batch_size, validation_data=(x_val, y_val), class_weight=class_weight_dict, callbacks=[early_stop])
 
     print(model.summary())
     return model
 
-def evaluate(final_model, x_train, y_train, x_val, y_val, x_test, y_test):
+def evaluate(model, x_train, y_train, x_val, y_val, x_test, y_test):
     # evaluate the CNN model
-    train_loss, train_acc = final_model.evaluate(x_train, y_train)  # evaluate train data
+    train_loss, train_acc = model.evaluate(x_train, y_train)  # evaluate train data
     print("Train - Loss:", train_loss, "Accuracy:", train_acc)
-    val_loss, val_acc = final_model.evaluate(x_val, y_val)  # evaluate validation data
+    val_loss, val_acc = model.evaluate(x_val, y_val)  # evaluate validation data
     print("Validation - Loss:", val_loss, "Accuracy:", val_acc)
-    test_loss, test_acc = final_model.evaluate(x_test, y_test)  # evaluate test data
+    test_loss, test_acc = model.evaluate(x_test, y_test)  # evaluate test data
     print("Test - Loss:", test_loss, "Accuracy:", test_acc)
 
     # extract features(Neural Code) from the CNN model
-    train_features = final_model.predict(x_train)
-    val_features = final_model.predict(x_val)
-    test_features = final_model.predict(x_test)
+    train_features = model.predict(x_train)
+    val_features = model.predict(x_val)
+    test_features = model.predict(x_test)
 
     # define parameter grid for KNN hyperparameters
     param_grid = {
@@ -180,21 +180,21 @@ def evaluate(final_model, x_train, y_train, x_val, y_val, x_test, y_test):
     train_recall = recall_score(y_train, train_pred, average='weighted')
     train_precision = precision_score(y_train, train_pred, average='weighted', zero_division=1)
     train_acc = accuracy_score(y_train, train_pred)
-    print("Evaluation report on train data for {} - F1 score:".format(final_model.name), train_f1, "Recall:", train_recall, "Precision:", train_precision, "Accuracy:", train_acc)
+    print("Evaluation report on train data for {} - F1 score:".format(model.name), train_f1, "Recall:", train_recall, "Precision:", train_precision, "Accuracy:", train_acc)
 
     val_pred = neigh.predict(val_features)
     val_f1 = f1_score(y_val, val_pred, average='weighted')
     val_recall = recall_score(y_val, val_pred, average='weighted')
     val_precision = precision_score(y_val, val_pred, average='weighted', zero_division=1)
     val_accuracy = accuracy_score(y_val, val_pred)
-    print("Evaluation report on validation data for {} - F1 score:".format(final_model.name), val_f1, "Recall:", val_recall, "Precision:", val_precision, "Accuracy:", val_accuracy)
+    print("Evaluation report on validation data for {} - F1 score:".format(model.name), val_f1, "Recall:", val_recall, "Precision:", val_precision, "Accuracy:", val_accuracy)
 
     test_pred = neigh.predict(test_features)
     test_f1 = f1_score(y_test, test_pred, average='weighted')
     test_recall = recall_score(y_test, test_pred, average='weighted')
     test_precision = precision_score(y_test, test_pred, average='weighted')
     test_acc = accuracy_score(y_test, test_pred)
-    print("Evaluation report on test data for {} - F1 score:".format(final_model.name), test_f1, "Recall:", test_recall, "Precision:", test_precision, "Accuracy:", test_acc)
+    print("Evaluation report on test data for {} - F1 score:".format(fmodel.name), test_f1, "Recall:", test_recall, "Precision:", test_precision, "Accuracy:", test_acc)
 
 if __name__ == "__main__":
 
