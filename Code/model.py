@@ -8,16 +8,16 @@ CHANNELS = 3  # set number of channels to 3 for RGB images
 class VGG16(tf.keras.Model):
     def __init__(self, num_classes, learning_rate):
         super(VGG16, self).__init__()
-        self.vgg16 = tf.keras.applications.VGG16(include_top=True, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
+        self.vgg16 = tf.keras.applications.VGG16(include_top=False, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
         for layer in self.vgg16.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm1 = tf.keras.layers.BatchNormalization()
-        self.dropout1 = tf.keras.layers.Dropout(0.5)
-        self.dense2 = tf.keras.layers.Dense(1024, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
+        self.dropout1 = tf.keras.layers.Dropout(0.2)
+        self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm2 = tf.keras.layers.BatchNormalization()
-        self.dropout2 = tf.keras.layers.Dropout(0.5)
+        self.dropout2 = tf.keras.layers.Dropout(0.2)
         self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
@@ -35,16 +35,16 @@ class VGG16(tf.keras.Model):
 class VGG19(tf.keras.Model):
     def __init__(self, num_classes, learning_rate):
         super(VGG19, self).__init__()
-        self.vgg19 = tf.keras.applications.VGG19(include_top=True, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
+        self.vgg19 = tf.keras.applications.VGG19(include_top=False, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
         for layer in self.vgg19.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm1 = tf.keras.layers.BatchNormalization()
-        self.dropout1 = tf.keras.layers.Dropout(0.5)
-        self.dense2 = tf.keras.layers.Dense(1024, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
+        self.dropout1 = tf.keras.layers.Dropout(0.2)
+        self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm2 = tf.keras.layers.BatchNormalization()
-        self.dropout2 = tf.keras.layers.Dropout(0.5)
+        self.dropout2 = tf.keras.layers.Dropout(0.2)
         self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
@@ -64,7 +64,7 @@ class InceptionModel(tf.keras.Model):
         super(InceptionModel, self).__init__()
 
         # Load the pre-trained InceptionV3 model
-        self.inceptionv3 = tf.keras.applications.InceptionV3(include_top=True, weights='imagenet',
+        self.inceptionv3 = tf.keras.applications.InceptionV3(include_top=False, weights='imagenet',
                                                              input_shape=(Image_Size, Image_Size, CHANNELS))
 
         # Freeze the weights of the pre-trained layers
@@ -75,10 +75,10 @@ class InceptionModel(tf.keras.Model):
         self.avgpool = tf.keras.layers.GlobalAveragePooling2D()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm1 = tf.keras.layers.BatchNormalization()
-        self.dropout1 = tf.keras.layers.Dropout(0.5)
+        self.dropout1 = tf.keras.layers.Dropout(0.2)
         self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm2 = tf.keras.layers.BatchNormalization()
-        self.dropout2 = tf.keras.layers.Dropout(0.5)
+        self.dropout2 = tf.keras.layers.Dropout(0.2)
         self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
@@ -96,16 +96,16 @@ class InceptionModel(tf.keras.Model):
 class ResNet50(tf.keras.Model):
     def __init__(self, num_classes, learning_rate):
         super(ResNet50, self).__init__()
-        self.resnet50 = tf.keras.applications.ResNet50(include_top=True, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
+        self.resnet50 = tf.keras.applications.ResNet50(include_top=False, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
         for layer in self.resnet50.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm1 = tf.keras.layers.BatchNormalization()
-        self.dropout1 = tf.keras.layers.Dropout(0.5)
+        self.dropout1 = tf.keras.layers.Dropout(0.2)
         self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm2 = tf.keras.layers.BatchNormalization()
-        self.dropout2 = tf.keras.layers.Dropout(0.5)
+        self.dropout2 = tf.keras.layers.Dropout(0.2)
         self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
@@ -123,16 +123,16 @@ class ResNet50(tf.keras.Model):
 class Xception(tf.keras.Model):
     def __init__(self, num_classes, learning_rate):
         super(Xception, self).__init__()
-        self.xception = tf.keras.applications.Xception(include_top=True, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
+        self.xception = tf.keras.applications.Xception(include_top=False, weights='imagenet', input_shape=(Image_Size, Image_Size, CHANNELS))
         for layer in self.xception.layers:
             layer.trainable = False
         self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(2048, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm1 = tf.keras.layers.BatchNormalization()
-        self.dropout1 = tf.keras.layers.Dropout(0.5)
+        self.dropout1 = tf.keras.layers.Dropout(0.2)
         self.dense2 = tf.keras.layers.Dense(1256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))
         self.batchnorm2 = tf.keras.layers.BatchNormalization()
-        self.dropout2 = tf.keras.layers.Dropout(0.5)
+        self.dropout2 = tf.keras.layers.Dropout(0.2)
         self.dense3 = tf.keras.layers.Dense(num_classes, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
 
     def call(self, inputs):
