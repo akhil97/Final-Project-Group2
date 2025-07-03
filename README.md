@@ -34,7 +34,7 @@ The Data folder should consist of these seven folders namely:-
 4. land
 5. multi
 6. ship
-7. water
+7. water<br>
 This is how the sample images look like:-
 ![](/Images/dataset_images.png)
 # Running the code
