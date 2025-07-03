@@ -35,7 +35,8 @@ The Data folder should consist of these seven folders namely:-
 5. multi
 6. ship
 7. water
-
+This is how the sample images look like:-
+![](/Images/dataset_images.png)
 # Running the code
 Once your project structure is ready, use the below command for running the script:-
 <br>
