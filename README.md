@@ -55,3 +55,5 @@ should have the following packages installed:- <br>
 4. cv2 == 4.7.0 <br>
 5. numpy == 1.24.1 <br>
 
+# Modelling results
+![](/Images/results.png)
