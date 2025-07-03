@@ -4,6 +4,7 @@
 - Scope of project
 - Overview
 - Dataset description
+- Sample images
 - Running the code
 
 # Scope of project
@@ -35,8 +36,10 @@ The Data folder should consist of these seven folders namely:-
 5. multi
 6. ship
 7. water<br>
-This is how the sample images look like:-
+
+# Sample images
 ![](/Images/dataset_images.png)
+
 # Running the code
 Once your project structure is ready, use the below command for running the script:-
 <br>
